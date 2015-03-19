@@ -19,7 +19,7 @@ opts = Slop.parse do |o|
 end
 
 STDERR.print "Password: "
-pwd = STDIN.noecho(&:gets)
+pwd = STDIN.noecho(&:gets).chomp
 puts
 s = TCPServer.new(opts[:hostname], opts[:port])
 STDERR.puts "listening on #{s.addr[2]}:#{s.addr[1]}" if opts[:verbose] || opts[:port] == 0

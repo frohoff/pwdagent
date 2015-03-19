@@ -31,7 +31,13 @@ $ gem specific_install -l [git-url]
 Usage
 ---------
 ```bash
-
+$ pwdagent -h
+usage: /home/cfrohoff/bin/pwdagent [options]
+    -h, --help
+    -v, --verbose
+    -p, --port      TCP port to listen on
+    -H, --hostname  TCP hostname to listen on
+    -s, --secret    secret string to require before sending password
 ```
 
 Example Usage

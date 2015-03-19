@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+
+require 'pwdagent'
+require 'slop'
+require 'io/console'
+require 'socket'
+
+Signal.trap("SIGINT"){ exit 130 }
+
+opts = Slop.parse do |o|
+  o.on '-h', '--help' do
+    STDERR.puts o
+    exit
+  end
+  o.bool '-v', '--verbose'
+  o.integer '-p', '--port', 'TCP port to listen on', default: 0
+  o.string '-H', '--hostname', 'TCP hostname to listen on', default: "127.0.0.1"
+  o.string '-s', '--secret', 'secret string to require before sending password'
+end
+
+STDERR.print "Password: "
+pwd = STDIN.noecho(&:gets)
+puts
+s = TCPServer.new(opts[:hostname], opts[:port])
+STDERR.puts "listening on #{s.addr[2]}:#{s.addr[1]}" if opts[:verbose] || opts[:port] == 0
+loop do 
+  Thread.start(s.accept) do |c|     
+    if ! opts[:secret] || c.read == opts[:secret] 
+      STDERR.puts "accepted connection from #{c.addr[2]}:#{c.addr[1]}" if opts[:verbose]      
+      c.print pwd
+    end    
+    c.close  
+  end
+end

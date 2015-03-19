@@ -1,4 +1,4 @@
-Netwit
+PwdAgent
 =========
 A barebones utility to hand out a password over a TCP listener. WARNING: for use in local application development only.
 

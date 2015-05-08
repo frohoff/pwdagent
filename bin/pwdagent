@@ -4,6 +4,7 @@ require 'pwdagent'
 require 'slop'
 require 'io/console'
 require 'socket'
+require 'webrick'
 
 Signal.trap("SIGINT"){ exit 130 }
 
@@ -13,6 +14,7 @@ opts = Slop.parse do |o|
     exit
   end
   o.bool '-v', '--verbose'
+  o.bool '-t', '--tcp', 'use raw TCP connection instead of HTTP'
   o.integer '-p', '--port', 'TCP port to listen on', default: 0
   o.string '-H', '--hostname', 'TCP hostname to listen on', default: "127.0.0.1"
   o.string '-s', '--secret', 'secret string to require before sending password'
@@ -21,14 +23,25 @@ end
 STDERR.print "Password: "
 pwd = STDIN.noecho(&:gets).chomp
 puts
-s = TCPServer.new(opts[:hostname], opts[:port])
-STDERR.puts "listening on #{s.addr[2]}:#{s.addr[1]}" if opts[:verbose] || opts[:port] == 0
-loop do 
-  Thread.start(s.accept) do |c|     
-    if ! opts[:secret] || c.read == opts[:secret] 
-      STDERR.puts "accepted connection from #{c.addr[2]}:#{c.addr[1]}" if opts[:verbose]      
-      c.print pwd
-    end    
-    c.close  
+if opts[:tcp]
+  s = TCPServer.new(opts[:hostname], opts[:port])
+  STDERR.puts "listening on #{s.addr[2]}:#{s.addr[1]}" + (opts[:secret] && " with secret '#{opts[:secret]}'" || "") if opts[:verbose] || opts[:port] == 0 || opts[:secret]
+  loop do 
+    Thread.start(s.accept) do |c|     
+      if ! opts[:secret] || c.read == opts[:secret] 
+        STDERR.puts "accepted connection from #{c.addr[2]}:#{c.addr[1]}" if opts[:verbose]      
+        c.print pwd
+      end    
+      c.close  
+    end
   end
+else # http
+  s = WEBrick::HTTPServer.new :BindAddress => opts[:hostname], :Port => opts[:port], :AccessLog => [], :Logger => WEBrick::Log::new("/dev/null", 7)
+  s.mount_proc(opts[:secret] && "/#{opts[:secret]}" || '/') do |req, res| 
+    STDERR.puts "accepted connection from #{req.peeraddr[2]}:#{req.peeraddr[1]}" if opts[:verbose]      
+    res.content_type = 'text/plain'
+    res.body = pwd 
+  end
+  STDERR.puts "listening on http://#{opts[:hostname]}:#{opts[:port]}" + (opts[:secret] && "/#{opts[:secret]}" || "/") if opts[:verbose] || opts[:port] == 0 || opts[:secret]
+  s.start
 end

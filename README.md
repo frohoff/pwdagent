@@ -1,6 +1,17 @@
 PwdAgent
 =========
-A barebones utility to cache a password in memory and hand it out over HTTP or raw TCP. WARNING: for use in local application development only.
+A barebones CLI utility to prompt for and cache a password in memory, then hand it out over HTTP or raw TCP. 
+
+DISCLAIMER: This program is only intended for use in local application development to avoid putting passwords on disk or prompting on every application startup. DO NOT use it for non-local/production systems!
+
+```bash
+$ pwdagent -p 6666 -s opensesame
+Password: [supersecretpassword]
+listening on http://127.0.0.1:6666/opensesame
+
+$ curl localhost:6666/opensesame
+supersecretpassword
+```
 
 Installation & Setup
 ------------

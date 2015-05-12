@@ -44,12 +44,31 @@ usage: /home/cfrohoff/bin/pwdagent [options]
 Example Usage
 ---------
 ```bash
-$ pwdagent # respond to http://localhost:{ephemeral-port}/ 
-$ pwdagent -p 6666 # respond on http://localhost:6666/
-$ pwdagent -p 6666 -s foobar # respond on http://localhost:6666/foobar/
-$ pwdagent -t # bind on ephemeral
-$ pwdagent -t -p 6666 # bind on port 6666
-$ pwdagent -t -p 6666 -s foobar # bind on port 6666 with secret of foobar
+$ pwdagent -p 6666
+Password: [supersecretpassword]
+
+$ curl localhost:6666
+supersecretpassword
+
+$ pwdagent -p 6666 -s opensesame
+Password: [supersecretpassword]
+listening on http://127.0.0.1:6666/opensesame
+
+$ curl localhost:6666/opensesame
+supersecretpassword
+
+$ pwdagent -t -p 6666
+Password: [supersecretpassword]
+
+$ nc localhost 6666
+supersecretpassword
+
+pwdagent -t -p 6666
+Password: [supersecretpassword]
+listening on 127.0.0.1:6666 with secret 'opensesame'
+
+$ echo -n "opensesame" | nc localhost 6666
+supersecretpassword
 ```
 
 Development

@@ -1,6 +1,6 @@
 PwdAgent
 =========
-A barebones utility to hand out a password over a TCP listener. WARNING: for use in local application development only.
+A barebones utility to hand out a password over an HTTP or raw TCP listener. WARNING: for use in local application development only.
 
 Installation & Setup
 ------------
@@ -35,6 +35,7 @@ $ pwdagent -h
 usage: /home/cfrohoff/bin/pwdagent [options]
     -h, --help
     -v, --verbose
+    -t, --tcp       use raw TCP connection instead of HTTP
     -p, --port      TCP port to listen on
     -H, --hostname  TCP hostname to listen on
     -s, --secret    secret string to require before sending password
@@ -43,9 +44,12 @@ usage: /home/cfrohoff/bin/pwdagent [options]
 Example Usage
 ---------
 ```bash
-$ pwdagent # bind on ephemeral
-$ pwdagent -p 6666 # bind on port 6666
-$ pwdagent -p 6666 -s foobar # bind on port 6666 with secret of foobar
+$ pwdagent # respond to http://localhost:{ephemeral-port}/ 
+$ pwdagent -p 6666 # respond on http://localhost:6666/
+$ pwdagent -p 6666 -s foobar # respond on http://localhost:6666/foobar/
+$ pwdagent -t # bind on ephemeral
+$ pwdagent -t -p 6666 # bind on port 6666
+$ pwdagent -t -p 6666 -s foobar # bind on port 6666 with secret of foobar
 ```
 
 Development

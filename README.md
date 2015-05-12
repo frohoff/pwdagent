@@ -1,6 +1,6 @@
 PwdAgent
 =========
-A barebones utility to hand out a password over an HTTP or raw TCP listener. WARNING: for use in local application development only.
+A barebones utility to cache a password in memory and hand it out over HTTP or raw TCP. WARNING: for use in local application development only.
 
 Installation & Setup
 ------------
